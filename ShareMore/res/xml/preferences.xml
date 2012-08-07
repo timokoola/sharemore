@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <PreferenceCategory
+        android:key="kippt_cat"
+        android:title="Kippt" >
+        <EditTextPreference
+            android:defaultValue="Username"
+            android:enabled="false"
+            android:key="kippt_username"
+            android:selectable="false"
+            android:title="Username" />
+        <EditTextPreference
+            android:defaultValue="APIToken"
+            android:enabled="false"
+            android:key="kippt_token"
+            android:selectable="false"
+            android:title="Kippt API Token" />
+
+        <Preference
+            android:key="manage_kippt"
+            android:summary="Open up web browser to manage your account e.g. to change the password."
+            android:title="Manage Your Kippt Account" >
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="https://kippt.com/accounts/settings/accounts/" />
+        </Preference>
+        <Preference
+            android:key="authenticate"
+            android:title="Sign in to Kippt">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:targetClass="com.moarub.sharemoar.LoginActivity"
+                android:targetPackage="com.moarub.sharemoar" />
+        </Preference>
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:key="share_moar_cat"
+        android:title="ShareMoar" >
+        <Preference
+            android:key="about"
+            android:title="About ShareMoar" >
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:targetClass="com.moarub.sharemoar.ShareMoarActivity"
+                android:targetPackage="com.moarub.sharemoar" />
+        </Preference>
+        <Preference
+            android:key="visit_sharemoar"
+            android:title="ShareMoar Webpage">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="http://moarub.com" />
+        </Preference> 
+    </PreferenceCategory>
+
+</PreferenceScreen>
