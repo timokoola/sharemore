@@ -22,8 +22,8 @@ import com.moarub.kipptapi.CreateClip;
 
 public class ShareToKipptActivity extends Activity implements OnClickListener,
 		ClipCreatedListener {
-	private String fUrlShared;
-	private String fTitle;
+	protected String fUrlShared;
+	protected String fTitle;
 	private TextView fTitleView;
 	private ConnectivityManager fConnectivityManager;
 	private CheckBox fReadLater;
@@ -33,6 +33,24 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_sahare_moar);
 
+		handleIntentInit();
+		initViews();
+	}
+
+	private void initViews() {
+		TextView urlV = (TextView) findViewById(R.id.editText1);
+		urlV.setText(fUrlShared);
+
+		fTitleView = (TextView) findViewById(R.id.editText3);
+		fTitleView.setText(fTitle);
+
+		Button b = (Button) findViewById(R.id.button1);
+		b.setOnClickListener(this);
+
+		fReadLater = (CheckBox) findViewById(R.id.checkBox1);
+	}
+
+	protected void handleIntentInit() {
 		Intent i = getIntent();
 
 		if (i != null && i.getType() != null
@@ -52,16 +70,6 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
 		} else {
 			finishWithError(R.string.inet_not_available);
 		}
-		TextView urlV = (TextView) findViewById(R.id.editText1);
-		urlV.setText(fUrlShared);
-
-		fTitleView = (TextView) findViewById(R.id.editText3);
-		fTitleView.setText(fTitle);
-
-		Button b = (Button) findViewById(R.id.button1);
-		b.setOnClickListener(this);
-		
-		fReadLater = (CheckBox) findViewById(R.id.checkBox1);
 	}
 
 	private void finishWithError(int resId) {
@@ -83,14 +91,14 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
 
 	private void callLoginActivity() {
 		Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-		startActivityForResult(intent , 700);
+		startActivityForResult(intent, 700);
 	}
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 	}
-	
+
 	@Override
 	protected void onResume() {
 		super.onResume();
@@ -102,19 +110,24 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
 		return true;
 	}
 
-	private void createClip() {
-		CreateClip cl = new CreateClip(fUrlShared, this);
+	protected void createClip() {
 		fTitle = fTitleView.getText().toString();
+		doCreateClip(fReadLater.isChecked(), false);
+	}
+
+	public void doCreateClip(boolean readLater, boolean star) {
+		CreateClip cl = new CreateClip(fUrlShared, this);
 
 		cl.addTitle(fTitle);
-		cl.setReadLater(fReadLater.isChecked());
+		cl.setReadLater(readLater);
+		cl.setStar(star);
 
 		SharedPreferences preferences = PreferenceManager
 				.getDefaultSharedPreferences(getApplicationContext());
 		String apiTokStr = preferences.getString("kippt_token", "");
 		String apiTokUser = preferences.getString("kippt_username", "");
 
-		String[] params = {apiTokUser, apiTokStr  };
+		String[] params = { apiTokUser, apiTokStr };
 		cl.execute(params);
 	}
 
@@ -128,8 +141,12 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
 		if (code == 201) {
 			Toast.makeText(getApplicationContext(), R.string.clip_created,
 					Toast.LENGTH_SHORT).show();
+		} else if (code == 401) {
+			Toast.makeText(getApplicationContext(), R.string.authentication_failed_password_changed,
+					Toast.LENGTH_SHORT).show();
+			callLoginActivity();
 		} else {
-			Toast.makeText(getApplicationContext(), "Error " + code,
+			Toast.makeText(getApplicationContext(), R.string.error_creation + code,
 					Toast.LENGTH_LONG).show();
 		}
 		finish();
