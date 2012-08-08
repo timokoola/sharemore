@@ -18,6 +18,9 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.text.Editable;
+import android.text.style.URLSpan;
+import android.text.util.Linkify;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
@@ -37,6 +40,7 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
 	private TextView fTitleView;
 	private ConnectivityManager fConnectivityManager;
 	private CheckBox fReadLater;
+	private String fGeneratedNoteText;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -68,10 +72,9 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
 			Bundle extras = i.getExtras();
 			Log.d("Received",
 					extras != null
-							&& extras.getString("android.intent.extra.TEXT") != null ? extras
-							.getString("android.intent.extra.TEXT")
+							&& cleanAndLinkify(extras) != null ? cleanAndLinkify(extras)
 							: "No extra text");
-			fUrlShared = extras.getString("android.intent.extra.TEXT");
+			fUrlShared = cleanAndLinkify(extras);
 			fTitle = extras.getString("android.intent.extra.SUBJECT");
 		}
 
@@ -80,6 +83,31 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
 		} else {
 			finishWithError(R.string.inet_not_available);
 		}
+	}
+
+	private String cleanAndLinkify(Bundle extras) {
+		String urlCandidate = extras.getString("android.intent.extra.TEXT");
+		if(urlCandidate != null && urlCandidate.startsWith("http://")) {
+			return urlCandidate;	
+		} else {
+			Editable str = Editable.Factory.getInstance().newEditable(urlCandidate);
+			Linkify.addLinks(str, Linkify.WEB_URLS);
+			URLSpan[] urls = str.getSpans(0, str.length(), URLSpan.class);
+			if(urls == null || urls.length < 1) {
+				abortNoURLS();
+			}
+			URLSpan uspan = urls[0];
+			fGeneratedNoteText = urlCandidate;
+			return uspan.getURL();
+		}
+		
+	}
+
+	private void abortNoURLS() {
+		Toast.makeText(getApplicationContext(), R.string.no_url_found_in_the_shared_text,
+				Toast.LENGTH_LONG).show();
+		finish();
+		
 	}
 
 	private void finishWithError(int resId) {
@@ -129,6 +157,9 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
 		CreateClip cl = new CreateClip(fUrlShared, this);
 
 		cl.addTitle(fTitle);
+		if(fGeneratedNoteText != null) {
+			cl.addNote(fGeneratedNoteText);
+		}
 		cl.setReadLater(readLater);
 		cl.setStar(star);
 
