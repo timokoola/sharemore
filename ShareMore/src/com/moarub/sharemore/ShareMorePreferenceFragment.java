@@ -10,7 +10,7 @@
  ******************************************************************************/
 package com.moarub.sharemore;
 
-import com.moarub.sharemoar.R;
+import com.moarub.sharemore.R;
 
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;

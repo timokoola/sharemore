@@ -21,7 +21,6 @@ import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.style.URLSpan;
 import android.text.util.Linkify;
-import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -32,7 +31,6 @@ import android.widget.Toast;
 
 import com.moarub.kipptapi.ClipCreatedListener;
 import com.moarub.kipptapi.CreateClip;
-import com.moarub.sharemoar.R;
 
 public class ShareToKipptActivity extends Activity implements OnClickListener,
 		ClipCreatedListener {

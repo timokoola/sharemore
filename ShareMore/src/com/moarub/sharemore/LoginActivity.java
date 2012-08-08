@@ -21,7 +21,7 @@ import android.widget.Toast;
 
 import com.moarub.kipptapi.ApiTokenListener;
 import com.moarub.kipptapi.KipptAPIToken;
-import com.moarub.sharemoar.R;
+import com.moarub.sharemore.R;
 
 
 public class LoginActivity extends Activity implements ApiTokenListener, OnClickListener {

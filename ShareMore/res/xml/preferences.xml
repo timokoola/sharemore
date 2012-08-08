@@ -40,8 +40,8 @@
             android:title="Sign in to Kippt">
             <intent
                 android:action="android.intent.action.VIEW"
-                android:targetClass="com.moarub.sharemoar.LoginActivity"
-                android:targetPackage="com.moarub.sharemoar" />
+                android:targetClass="com.moarub.sharemore.LoginActivity"
+                android:targetPackage="com.moarub.sharemore" />
         </Preference>
     </PreferenceCategory><PreferenceCategory android:title="Kippt Quick Share" android:key="quick_kippt">
         <CheckBoxPreference android:title="Read Later Quick Shares" android:key="quick_read_later" android:defaultValue="false" android:summary='Mark quick share items "Read Later"' />
@@ -55,8 +55,8 @@
             android:title="About ShareMore" >
             <intent
                 android:action="android.intent.action.VIEW"
-                android:targetClass="com.moarub.sharemoar.ShareMoarActivity"
-                android:targetPackage="com.moarub.sharemoar" />
+                android:targetClass="com.moarub.sharemoar.ShareMoreActivity"
+                android:targetPackage="com.moarub.sharemore" />
         </Preference>
         <Preference
             android:key="visit_sharemoar"
