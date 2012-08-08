@@ -8,7 +8,9 @@
  * Contributors:
  *     Moarub Oy - initial API and implementation
  ******************************************************************************/
-package com.moarub.sharemoar;
+package com.moarub.sharemore;
+
+import com.moarub.sharemoar.R;
 
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;

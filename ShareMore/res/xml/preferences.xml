@@ -49,10 +49,10 @@
     </PreferenceCategory>
     <PreferenceCategory
         android:key="share_moar_cat"
-        android:title="ShareMoar" >
+        android:title="ShareMore" >
         <Preference
             android:key="about"
-            android:title="About ShareMoar" >
+            android:title="About ShareMore" >
             <intent
                 android:action="android.intent.action.VIEW"
                 android:targetClass="com.moarub.sharemoar.ShareMoarActivity"
@@ -60,7 +60,7 @@
         </Preference>
         <Preference
             android:key="visit_sharemoar"
-            android:title="ShareMoar Webpage">
+            android:title="ShareMore Webpage">
             <intent
                 android:action="android.intent.action.VIEW"
                 android:data="http://moarub.com" />

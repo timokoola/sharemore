@@ -23,6 +23,9 @@ import android.util.Log;
 public class KipptAPIHelpers {
 
 	public static StringBuilder getResponseString(HttpResponse result) {
+		if(result == null) {
+			return null;
+		}
 		StringBuilder builder = new StringBuilder(""); 
 		
 		HttpEntity res = result.getEntity();

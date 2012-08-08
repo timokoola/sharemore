@@ -8,7 +8,7 @@
  * Contributors:
  *     Moarub Oy - initial API and implementation
  ******************************************************************************/
-package com.moarub.sharemoar;
+package com.moarub.sharemore;
 
 import android.app.Activity;
 import android.os.Bundle;

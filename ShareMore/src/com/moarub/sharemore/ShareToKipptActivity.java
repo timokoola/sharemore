@@ -8,7 +8,7 @@
  * Contributors:
  *     Moarub Oy - initial API and implementation
  ******************************************************************************/
-package com.moarub.sharemoar;
+package com.moarub.sharemore;
 
 import android.app.Activity;
 import android.content.Context;
@@ -32,6 +32,7 @@ import android.widget.Toast;
 
 import com.moarub.kipptapi.ClipCreatedListener;
 import com.moarub.kipptapi.CreateClip;
+import com.moarub.sharemoar.R;
 
 public class ShareToKipptActivity extends Activity implements OnClickListener,
 		ClipCreatedListener {

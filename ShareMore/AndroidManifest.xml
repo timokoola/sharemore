@@ -37,6 +37,20 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".QuickShareToKipptActivity"
+            android:label="@string/title_activity_sahare_moar_quick"
+            android:screenOrientation="portrait" >
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="text/*" />
+            </intent-filter>
+        </activity>
+        
+        
+        <activity
             android:name=".ShareMorePreferencesActivity"
             android:label="ShareMore"
             android:screenOrientation="portrait" >
