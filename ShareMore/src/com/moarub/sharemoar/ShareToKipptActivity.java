@@ -20,7 +20,7 @@ import android.widget.Toast;
 import com.moarub.kipptapi.ClipCreatedListener;
 import com.moarub.kipptapi.CreateClip;
 
-public class ShareMoreActivity extends Activity implements OnClickListener,
+public class ShareToKipptActivity extends Activity implements OnClickListener,
 		ClipCreatedListener {
 	private String fUrlShared;
 	private String fTitle;
