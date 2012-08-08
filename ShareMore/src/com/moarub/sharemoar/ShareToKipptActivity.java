@@ -70,12 +70,13 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
 		if (i != null && i.getType() != null
 				&& i.getType().equalsIgnoreCase("text/plain")) {
 			Bundle extras = i.getExtras();
-			Log.d("Received",
-					extras != null
-							&& cleanAndLinkify(extras) != null ? cleanAndLinkify(extras)
-							: "No extra text");
-			fUrlShared = cleanAndLinkify(extras);
+			String cleanAndLinkify = cleanAndLinkify(extras);
+			fUrlShared = cleanAndLinkify != null ? cleanAndLinkify : null;
 			fTitle = extras.getString("android.intent.extra.SUBJECT");
+		}
+		
+		if(fUrlShared == null) {
+			finishWithError(R.string.no_url_found_in_the_shared_text);
 		}
 
 		if (isOnline()) {
@@ -94,19 +95,12 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
 			Linkify.addLinks(str, Linkify.WEB_URLS);
 			URLSpan[] urls = str.getSpans(0, str.length(), URLSpan.class);
 			if(urls == null || urls.length < 1) {
-				abortNoURLS();
+				return null;
 			}
 			URLSpan uspan = urls[0];
 			fGeneratedNoteText = urlCandidate;
 			return uspan.getURL();
 		}
-		
-	}
-
-	private void abortNoURLS() {
-		Toast.makeText(getApplicationContext(), R.string.no_url_found_in_the_shared_text,
-				Toast.LENGTH_LONG).show();
-		finish();
 		
 	}
 
