@@ -26,6 +26,7 @@ public class ApiToken extends AsyncTask<String, Void, HttpResponse> {
 	private String fToken;
 	private ApiTokenListener fListener;
 	private String fUserName;
+	public static final String reqTokenUrl = "https://kippt.com/api/account/";
 	
 	public ApiToken(ApiTokenListener listener) {
 		super();
@@ -36,7 +37,6 @@ public class ApiToken extends AsyncTask<String, Void, HttpResponse> {
 	protected HttpResponse doInBackground(String... u) {
 		String username = u[0];
 		String password = u[1];
-		String reqTokenUrl = "https://kippt.com/api/account/";
 		DefaultHttpClient client = new DefaultHttpClient();
 		Credentials creds = new UsernamePasswordCredentials(username,password);
 		client.getCredentialsProvider().setCredentials(new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT), creds);

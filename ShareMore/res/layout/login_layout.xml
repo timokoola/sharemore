@@ -16,7 +16,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:text="moarubtesti" >
+        android:text="username" >
 
         <requestFocus />
     </EditText>
@@ -34,7 +34,7 @@
         android:layout_height="wrap_content"
         android:ems="10"
         android:inputType="textPassword"
-        android:text="WKxEvlMsLSljTQ4j" />
+        android:text="password" />
 
     <TextView
         android:id="@+id/loginInfo"
