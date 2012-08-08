@@ -1,11 +1,7 @@
 package com.moarub.kipptapi;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
@@ -18,13 +14,12 @@ import org.json.JSONTokener;
 import android.os.AsyncTask;
 import android.util.Log;
 
-public class ListsGetter extends AsyncTask<ApiToken, Void, HttpResponse> {
-	private ApiToken fApiToken;
-	private String fToken;
+public class ListsGetter extends AsyncTask<KipptAPIToken, Void, HttpResponse> {
+	private KipptAPIToken fApiToken;
 	private JSONArray fLists;
 
 	@Override
-	protected HttpResponse doInBackground(ApiToken... params) {
+	protected HttpResponse doInBackground(KipptAPIToken... params) {
 		fApiToken = params[0];
 		String reqTokenUrl = "https://kippt.com/api/lists/";
 		DefaultHttpClient client = new DefaultHttpClient();
@@ -46,7 +41,7 @@ public class ListsGetter extends AsyncTask<ApiToken, Void, HttpResponse> {
 
 	@Override
 	protected void onPostExecute(HttpResponse result) {
-		StringBuilder builder = getResponseString(result);
+		StringBuilder builder = KipptAPIHelpers.getResponseString(result);
 
 		try {
 			JSONObject jobj = (JSONObject) new JSONTokener(builder.toString())
@@ -65,35 +60,6 @@ public class ListsGetter extends AsyncTask<ApiToken, Void, HttpResponse> {
 			return;
 		}
 		Log.d("Result", builder.toString());
-	}
-
-	private StringBuilder getResponseString(HttpResponse result) {
-		fToken = "";
-		StringBuilder builder = new StringBuilder(fToken);
-
-		HttpEntity res = result.getEntity();
-		InputStream is = null;
-		try {
-			is = res.getContent();
-		} catch (IllegalStateException e) {
-			Log.d("ApiTokenFailure", "Can't fetch API Token");
-			return builder;
-		} catch (IOException e) {
-			Log.d("ApiTokenFailure", "Can't fetch API Token");
-			return builder;
-		}
-		BufferedReader br = new BufferedReader(new InputStreamReader(is));
-
-		String line = null;
-		try {
-			while ((line = br.readLine()) != null) {
-				builder.append(line);
-			}
-		} catch (IOException e) {
-			Log.d("ApiTokenFailure", "Can't fetch API Token");
-			return builder;
-		}
-		return builder;
 	}
 
 	public JSONArray getLists() {

@@ -1,12 +1,7 @@
 package com.moarub.sharemoar;
-import com.moarub.kipptapi.ApiToken;
-import com.moarub.kipptapi.ApiTokenListener;
-
 import android.app.Activity;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
-import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -14,11 +9,13 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.moarub.kipptapi.ApiTokenListener;
+import com.moarub.kipptapi.KipptAPIToken;
+
 
 public class LoginActivity extends Activity implements ApiTokenListener, OnClickListener {
 
-	private ApiToken fAPIToken;
-	private boolean fReady;
+	private KipptAPIToken fAPIToken;
 	private TextView fUsername;
 	private TextView fPassword;
 
@@ -36,7 +33,7 @@ public class LoginActivity extends Activity implements ApiTokenListener, OnClick
 		
 	
 	private void fetchAPIToken(String un, String pw) {
-		fAPIToken = new ApiToken(this);
+		fAPIToken = new KipptAPIToken(this);
 		String[] params = {un,pw};
 		fAPIToken.execute(params);
 	}

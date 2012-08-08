@@ -1,7 +1,5 @@
 package com.moarub.sharemoar;
 
-import java.util.Set;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -19,22 +17,15 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.moarub.kipptapi.ApiToken;
-import com.moarub.kipptapi.ApiTokenListener;
 import com.moarub.kipptapi.ClipCreatedListener;
 import com.moarub.kipptapi.CreateClip;
 
-public class ShareMoarActivity extends Activity implements OnClickListener,
+public class ShareMoreActivity extends Activity implements OnClickListener,
 		ClipCreatedListener {
-	private boolean fReadyToken;
-	private boolean fSharing;
 	private String fUrlShared;
-	private String fNotes;
-	private TextView fNoteView;
 	private String fTitle;
 	private TextView fTitleView;
 	private ConnectivityManager fConnectivityManager;
-	private NetworkInfo fNetworkInfo;
 	private CheckBox fReadLater;
 
 	@Override
@@ -47,13 +38,11 @@ public class ShareMoarActivity extends Activity implements OnClickListener,
 		if (i != null && i.getType() != null
 				&& i.getType().equalsIgnoreCase("text/plain")) {
 			Bundle extras = i.getExtras();
-			Set<String> ss = extras.keySet();
 			Log.d("Received",
 					extras != null
 							&& extras.getString("android.intent.extra.TEXT") != null ? extras
 							.getString("android.intent.extra.TEXT")
 							: "No extra text");
-			fSharing = true;
 			fUrlShared = extras.getString("android.intent.extra.TEXT");
 			fTitle = extras.getString("android.intent.extra.SUBJECT");
 		}
@@ -100,7 +89,6 @@ public class ShareMoarActivity extends Activity implements OnClickListener,
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
-		Toast.makeText(getApplicationContext(), "Finished child activity", Toast.LENGTH_SHORT);
 	}
 	
 	@Override

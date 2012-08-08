@@ -1,11 +1,7 @@
 package com.moarub.kipptapi;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.ClientProtocolException;
@@ -23,16 +19,23 @@ import android.util.Log;
 public class CreateClip extends AsyncTask<String, Void, HttpResponse> {
 
 	private String fClipUrl;
-	private String fApiToken;
-	private String fToken;
-	private String fNote;
-	private String fTitle;
 	private ClipCreatedListener fListener;
+	private String fNote;
 	private boolean fReadLater;
+	private boolean fStar;
+	private String fTitle;
 
 	public CreateClip(String clip, ClipCreatedListener listener) {
 		fClipUrl = clip;
 		fListener = listener;
+	}
+
+	public void addNote(String fNotes) {
+		fNote = fNotes;
+	}
+
+	public void addTitle(String title) {
+		fTitle = title;
 	}
 
 	@Override
@@ -59,6 +62,9 @@ public class CreateClip extends AsyncTask<String, Void, HttpResponse> {
 			if(fReadLater) {
 				job.put("is_read_later", true);
 			}
+			if(fStar) {
+				job.put("is_star", true);
+			}
 
 			StringEntity se = new StringEntity(job.toString(), "UTF-8");
 			se.setContentType(new BasicHeader(HTTP.CONTENT_TYPE,
@@ -67,8 +73,6 @@ public class CreateClip extends AsyncTask<String, Void, HttpResponse> {
 			Log.d("Sending clip JSON", job.toString());
 
 			request.setEntity(se);
-
-			// request.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 
 			return client.execute(request);
 		} catch (ClientProtocolException e) {
@@ -83,52 +87,20 @@ public class CreateClip extends AsyncTask<String, Void, HttpResponse> {
 		}
 	}
 
+
 	@Override
 	protected void onPostExecute(HttpResponse result) {
 		StatusLine sl = result.getStatusLine();
 
 		Log.d("CreateClip", sl.getStatusCode() + " " + sl.getReasonPhrase());
-		Log.d("CreateClip", getResponseString(result).toString());
+		Log.d("CreateClip", KipptAPIHelpers.getResponseString(result).toString());
 
 		fListener.onClipCreated(sl.getStatusCode());
 
 	}
 
-	private StringBuilder getResponseString(HttpResponse result) {
-		fToken = "";
-		StringBuilder builder = new StringBuilder(fToken);
-
-		HttpEntity res = result.getEntity();
-		InputStream is = null;
-		try {
-			is = res.getContent();
-		} catch (IllegalStateException e) {
-			Log.d("ApiTokenFailure", "Can't fetch API Token");
-			return builder;
-		} catch (IOException e) {
-			Log.d("ApiTokenFailure", "Can't fetch API Token");
-			return builder;
-		}
-		BufferedReader br = new BufferedReader(new InputStreamReader(is));
-
-		String line = null;
-		try {
-			while ((line = br.readLine()) != null) {
-				builder.append(line);
-			}
-		} catch (IOException e) {
-			Log.d("ApiTokenFailure", "Can't fetch API Token");
-			return builder;
-		}
-		return builder;
-	}
-
-	public void addNote(String fNotes) {
-		fNote = fNotes;
-	}
-
-	public void addTitle(String title) {
-		fTitle = title;
+	public void setStar(boolean star) {
+		fStar = star;
 	}
 
 	public void setReadLater(boolean checked) {

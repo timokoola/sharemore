@@ -7,7 +7,7 @@ public class ShareMorePreferencesActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		getFragmentManager().beginTransaction().replace(android.R.id.content, new ShareMoarPreferenceFragment())
+		getFragmentManager().beginTransaction().replace(android.R.id.content, new ShareMorePreferenceFragment())
         .commit();
 	}
 	
