@@ -55,7 +55,7 @@
             android:title="About ShareMore" >
             <intent
                 android:action="android.intent.action.VIEW"
-                android:targetClass="com.moarub.sharemoar.ShareMoreActivity"
+                android:targetClass="com.moarub.sharemore.ShareMoreActivity"
                 android:targetPackage="com.moarub.sharemore" />
         </Preference>
         <Preference

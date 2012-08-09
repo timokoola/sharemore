@@ -73,7 +73,7 @@ public class CreateClip extends AsyncTask<String, Void, HttpResponse> {
 				job.put("is_read_later", true);
 			}
 			if(fStar) {
-				job.put("is_star", true);
+				job.put("is_starred", true);
 			}
 
 			StringEntity se = new StringEntity(job.toString(), "UTF-8");
