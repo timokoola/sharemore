@@ -23,8 +23,7 @@
             android:id="@+id/textView3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:inputType="text|textNoSuggestions"
-            android:paddingLeft="@dimen/text_padding_left"
+            android:paddingLeft="@dimen/text_padding_left_title"
             android:text="@string/title"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textSize="@dimen/title_text_size_share" />
@@ -34,13 +33,31 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:inputType="text|textMultiLine|textImeMultiLine|textNoSuggestions" />
+            android:inputType="text|textMultiLine|textImeMultiLine|textNoSuggestions"
+            android:textSize="6pt" >
 
+            <requestFocus />
+        </EditText>
+
+          <TextView
+            android:id="@+id/textView4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="@dimen/text_padding_left_title"
+            android:text="@string/list"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textSize="@dimen/title_text_size_share" />
+        
+        <Spinner android:id="@+id/ls_spinner"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"/>
+          
+          
         <TextView
             android:id="@+id/textView1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingLeft="@dimen/text_padding_left"
+            android:paddingLeft="@dimen/text_padding_left_title"
             android:text="@string/url"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textSize="@dimen/title_text_size_share" />
@@ -50,28 +67,29 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:inputType="text|textMultiLine|textImeMultiLine|textNoSuggestions" >
-            
+            android:inputType="text|textMultiLine|textImeMultiLine|textNoSuggestions"
+            android:textSize="6pt" >
         </EditText>
+        
+         <TextView
+            android:id="@+id/textViewNotes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="@dimen/text_padding_left_title"
+            android:text="@string/notes"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textSize="@dimen/title_text_size_share" />
 
-        <LinearLayout
+        <EditText
+            android:id="@+id/editTextNotes"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="right" >
-
-            <CheckBox
-                android:id="@+id/checkBox1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1.07"
-                android:text="@string/readlater" />
-
-            <Button
-                android:id="@+id/button1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/share_to_kippt" />
-        </LinearLayout>
+            android:ems="10"
+            android:inputType="text|textMultiLine|textImeMultiLine|textNoSuggestions"
+            android:textSize="6pt" >
+        </EditText>
+        
+        
 
     </LinearLayout>
 

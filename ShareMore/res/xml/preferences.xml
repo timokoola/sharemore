@@ -55,8 +55,7 @@
             android:title="About ShareMore" >
             <intent
                 android:action="android.intent.action.VIEW"
-                android:targetClass="com.moarub.sharemore.ShareMoreActivity"
-                android:targetPackage="com.moarub.sharemore" />
+                android:data="https://github.com/timokoola/sharemore/blob/master/README.md" />
         </Preference>
         <Preference
             android:key="visit_sharemoar"

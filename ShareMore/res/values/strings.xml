@@ -26,8 +26,13 @@
     <string name="username">Username</string>
     <string name="password">Password</string>
     <string name="login">Sign in</string>
+    <string name="star">Star this</string>
+    <string name="list">List</string>
+    <string name="menu_add_notes">Add Notes</string>
+    <string name="menu_send">Kippt it!</string>
     <string name="error_creation">"Error "</string>
     <string name="authentication_failed_password_changed">Authentication failed, password changed?</string>
     <string name="no_url_found_in_the_shared_text">No URL found in the shared text</string>
+    <string name="star_item">Star</string>
 
 </resources>

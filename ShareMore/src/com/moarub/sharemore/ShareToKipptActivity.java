@@ -14,18 +14,23 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.ContactsContract.CommonDataKinds.Note;
 import android.text.Editable;
 import android.text.style.URLSpan;
 import android.text.util.Linkify;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,6 +42,7 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
 	protected String fUrlShared;
 	protected String fTitle;
 	private TextView fTitleView;
+	private TextView fNoteView;
 	private ConnectivityManager fConnectivityManager;
 	private CheckBox fReadLater;
 	private String fGeneratedNoteText;
@@ -57,10 +63,16 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
 		fTitleView = (TextView) findViewById(R.id.editText3);
 		fTitleView.setText(fTitle);
 
-		Button b = (Button) findViewById(R.id.button1);
-		b.setOnClickListener(this);
+		Spinner ps = (Spinner) findViewById(R.id.ls_spinner);
+		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
+				this, R.array.lists, R.layout.spinner_item_lists);
+		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		ps.setAdapter(adapter);
 
-		fReadLater = (CheckBox) findViewById(R.id.checkBox1);
+		fNoteView = (TextView) findViewById(R.id.editTextNotes);
+		if (fGeneratedNoteText != null) {
+			fNoteView.setText(fGeneratedNoteText);
+		}
 	}
 
 	protected void handleIntentInit() {
@@ -70,11 +82,11 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
 				&& i.getType().equalsIgnoreCase("text/plain")) {
 			Bundle extras = i.getExtras();
 			String cleanAndLinkify = cleanAndLinkify(extras);
-			fUrlShared = cleanAndLinkify != null ? cleanAndLinkify : null;
+			fUrlShared = cleanAndLinkify;
 			fTitle = extras.getString("android.intent.extra.SUBJECT");
 		}
-		
-		if(fUrlShared == null) {
+
+		if (fUrlShared == null) {
 			finishWithError(R.string.no_url_found_in_the_shared_text);
 		}
 
@@ -87,20 +99,22 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
 
 	private String cleanAndLinkify(Bundle extras) {
 		String urlCandidate = extras.getString("android.intent.extra.TEXT");
-		if(urlCandidate != null && urlCandidate.startsWith("http://")) {
-			return urlCandidate;	
+		if (urlCandidate != null && urlCandidate.startsWith("http://")) {
+			return urlCandidate;
 		} else {
-			Editable str = Editable.Factory.getInstance().newEditable(urlCandidate);
+			Editable str = Editable.Factory.getInstance().newEditable(
+					urlCandidate);
 			Linkify.addLinks(str, Linkify.WEB_URLS);
 			URLSpan[] urls = str.getSpans(0, str.length(), URLSpan.class);
-			if(urls == null || urls.length < 1) {
+			if (urls == null || urls.length < 1) {
 				return null;
 			}
 			URLSpan uspan = urls[0];
 			fGeneratedNoteText = urlCandidate;
+			
 			return uspan.getURL();
 		}
-		
+
 	}
 
 	private void finishWithError(int resId) {
@@ -143,14 +157,14 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
 
 	protected void createClip() {
 		fTitle = fTitleView.getText().toString();
-		doCreateClip(fReadLater.isChecked(), false);
+		doCreateClip(false, false);
 	}
 
 	public void doCreateClip(boolean readLater, boolean star) {
 		CreateClip cl = new CreateClip(fUrlShared, this);
 
 		cl.addTitle(fTitle);
-		if(fGeneratedNoteText != null) {
+		if (fGeneratedNoteText != null) {
 			cl.addNote(fGeneratedNoteText);
 		}
 		cl.setReadLater(readLater);
@@ -176,12 +190,13 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
 			Toast.makeText(getApplicationContext(), R.string.clip_created,
 					Toast.LENGTH_SHORT).show();
 		} else if (code == 401) {
-			Toast.makeText(getApplicationContext(), R.string.authentication_failed_password_changed,
+			Toast.makeText(getApplicationContext(),
+					R.string.authentication_failed_password_changed,
 					Toast.LENGTH_SHORT).show();
 			callLoginActivity();
 		} else {
-			Toast.makeText(getApplicationContext(), R.string.error_creation + code,
-					Toast.LENGTH_LONG).show();
+			Toast.makeText(getApplicationContext(),
+					R.string.error_creation + code, Toast.LENGTH_LONG).show();
 		}
 		finish();
 	}
@@ -191,6 +206,45 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
 		NetworkInfo ni = fConnectivityManager.getActiveNetworkInfo();
 		boolean result = ni != null && ni.isAvailable() && ni.isConnected();
 		return result;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.menu_read_later: {
+			item.setChecked(!item.isChecked());
+			item.setIcon(getIcon(item));
+			return true;
+		}
+		case R.id.menu_star: {
+			item.setChecked(!item.isChecked());
+			item.setIcon(getIcon(item));
+			return true;
+		}
+		case R.id.menu_send: {
+			createClip();
+		}
+		default:
+			return super.onOptionsItemSelected(item);
+		}
+
+	}
+
+	private Drawable getIcon(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.menu_read_later: {
+			return item.isChecked() ? getResources().getDrawable(
+					R.drawable.ic_action_glasses) : getResources().getDrawable(
+					R.drawable.ic_action_glasses_gray);
+		}
+		case R.id.menu_star: {
+			return item.isChecked() ? getResources().getDrawable(
+					R.drawable.ic_action_star_10) : getResources().getDrawable(
+					R.drawable.ic_action_star_0);
+		}
+		default:
+			return null;
+		}
 	}
 
 }
