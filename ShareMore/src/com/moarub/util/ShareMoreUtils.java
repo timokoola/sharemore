@@ -8,7 +8,7 @@
  * Contributors:
  *     Moarub Oy - initial API and implementation
  ******************************************************************************/
-package com.moarub.kipptapi;
+package com.moarub.util;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -18,9 +18,10 @@ import java.io.InputStreamReader;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 
+import android.os.AsyncTask;
 import android.util.Log;
 
-public class KipptAPIHelpers {
+public class ShareMoreUtils {
 
 	public static StringBuilder getResponseString(HttpResponse result) {
 		if(result == null) {
@@ -53,5 +54,6 @@ public class KipptAPIHelpers {
 		}
 		return builder;
 	}
+
 
 }

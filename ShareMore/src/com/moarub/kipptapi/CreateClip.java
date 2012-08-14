@@ -23,6 +23,8 @@ import org.apache.http.protocol.HTTP;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.moarub.util.ShareMoreUtils;
+
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -103,10 +105,8 @@ public class CreateClip extends AsyncTask<String, Void, HttpResponse> {
 		StatusLine sl = result.getStatusLine();
 
 		Log.d("CreateClip", sl.getStatusCode() + " " + sl.getReasonPhrase());
-		Log.d("CreateClip", KipptAPIHelpers.getResponseString(result).toString());
 
 		fListener.onClipCreated(sl.getStatusCode());
-
 	}
 
 	public void setStar(boolean star) {

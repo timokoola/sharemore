@@ -21,6 +21,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
+import com.moarub.util.ShareMoreUtils;
+
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -51,7 +53,7 @@ public class ListsGetter extends AsyncTask<KipptAPIToken, Void, HttpResponse> {
 
 	@Override
 	protected void onPostExecute(HttpResponse result) {
-		StringBuilder builder = KipptAPIHelpers.getResponseString(result);
+		StringBuilder builder = ShareMoreUtils.getResponseString(result);
 
 		try {
 			JSONObject jobj = (JSONObject) new JSONTokener(builder.toString())

@@ -36,9 +36,11 @@ import android.widget.Toast;
 
 import com.moarub.kipptapi.ClipCreatedListener;
 import com.moarub.kipptapi.CreateClip;
+import com.moarub.util.UrlDeshortener;
+import com.moarub.util.UrlDeshortenerListener;
 
 public class ShareToKipptActivity extends Activity implements OnClickListener,
-		ClipCreatedListener {
+		ClipCreatedListener, UrlDeshortenerListener {
 	protected String fUrlShared;
 	protected String fTitle;
 	private TextView fTitleView;
@@ -46,6 +48,8 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
 	private ConnectivityManager fConnectivityManager;
 	private CheckBox fReadLater;
 	private String fGeneratedNoteText;
+	private UrlDeshortener fUrlDeshortener;
+	private boolean fIgnoreShortening;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -57,10 +61,10 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
 	}
 
 	private void initViews() {
-		TextView urlV = (TextView) findViewById(R.id.editText1);
+		TextView urlV = (TextView) findViewById(R.id.urlTextEditor);
 		urlV.setText(fUrlShared);
 
-		fTitleView = (TextView) findViewById(R.id.editText3);
+		fTitleView = (TextView) findViewById(R.id.titleTextEditor);
 		fTitleView.setText(fTitle);
 
 		Spinner ps = (Spinner) findViewById(R.id.ls_spinner);
@@ -81,13 +85,15 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
 		if (i != null && i.getType() != null
 				&& i.getType().equalsIgnoreCase("text/plain")) {
 			Bundle extras = i.getExtras();
-			String cleanAndLinkify = cleanAndLinkify(extras);
-			fUrlShared = cleanAndLinkify;
+			fUrlShared = cleanAndLinkify(extras);
 			fTitle = extras.getString("android.intent.extra.SUBJECT");
 		}
 
 		if (fUrlShared == null) {
 			finishWithError(R.string.no_url_found_in_the_shared_text);
+		} else if(fUrlShared.length() < 27) {
+			fUrlDeshortener = new UrlDeshortener(this);
+			fUrlDeshortener.execute(fUrlShared);
 		}
 
 		if (isOnline()) {
@@ -156,6 +162,10 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
 	}
 
 	protected void createClip() {
+		if(fUrlDeshortener != null) {
+			fUrlDeshortener.cancel(true);
+			fIgnoreShortening = true;
+		}
 		fTitle = fTitleView.getText().toString();
 		doCreateClip(false, false);
 	}
@@ -244,6 +254,27 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
 		}
 		default:
 			return null;
+		}
+	}
+
+	@Override
+	public void onURLDeshortened(String resolution, int responseCode) {
+		if(resolution != null && !fIgnoreShortening) {
+			fUrlShared = resolution;
+			TextView urlView = (TextView) findViewById(R.id.urlTextEditor);
+			urlView.setText(fUrlShared);
+			if(responseCode > 399) {
+				fUrlDeshortener = null;
+			}
+			urlView.invalidate();
+ 		}
+	}
+
+	@Override
+	public void onTitleUpdate(String newTitle) {
+		if(newTitle != null && !fIgnoreShortening) {
+			fTitleView.setText(newTitle);
+			fTitleView.invalidate();
 		}
 	}
 
