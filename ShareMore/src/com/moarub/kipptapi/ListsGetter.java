@@ -11,6 +11,7 @@
 package com.moarub.kipptapi;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -21,27 +22,34 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
+import com.moarub.kipptapi.ListsGetter.ListItem;
 import com.moarub.util.ShareMoreUtils;
 
 import android.os.AsyncTask;
 import android.util.Log;
 
-public class ListsGetter extends AsyncTask<KipptAPIToken, Void, HttpResponse> {
-	private KipptAPIToken fApiToken;
+public class ListsGetter extends AsyncTask<String, Void, StringBuilder> {
 	private JSONArray fLists;
+	private ListsListener fListener;
 
+	public ListsGetter(ListsListener listener) {
+		fListener = listener;
+	}
+	
 	@Override
-	protected HttpResponse doInBackground(KipptAPIToken... params) {
-		fApiToken = params[0];
+	protected StringBuilder doInBackground(String... params) {
+		String username = params[0];
+		String password = params[1];
 		String reqTokenUrl = "https://kippt.com/api/lists/";
 		DefaultHttpClient client = new DefaultHttpClient();
 
 		try {
 			HttpGet request = new HttpGet(reqTokenUrl);
-			request.addHeader("X-Kippt-Username", fApiToken.getUserName());
-			request.addHeader("X-Kippt-API-Token", fApiToken.getResult());
+			request.addHeader("X-Kippt-Username", username);
+			request.addHeader("X-Kippt-API-Token", password);
 
-			return client.execute(request);
+			HttpResponse lists = client.execute(request);
+			return ShareMoreUtils.getResponseString(lists);
 		} catch (ClientProtocolException e) {
 			Log.d("ApiTokenFailure", "Can't fetch API Token");
 			return null;
@@ -52,11 +60,9 @@ public class ListsGetter extends AsyncTask<KipptAPIToken, Void, HttpResponse> {
 	}
 
 	@Override
-	protected void onPostExecute(HttpResponse result) {
-		StringBuilder builder = ShareMoreUtils.getResponseString(result);
-
+	protected void onPostExecute(StringBuilder result) {
 		try {
-			JSONObject jobj = (JSONObject) new JSONTokener(builder.toString())
+			JSONObject jobj = (JSONObject) new JSONTokener(result.toString())
 					.nextValue();
 			
 			setLists(jobj.getJSONArray("objects"));
@@ -71,7 +77,8 @@ public class ListsGetter extends AsyncTask<KipptAPIToken, Void, HttpResponse> {
 			Log.d("ApiTokenFailure", "Can't fetch API Token");
 			return;
 		}
-		Log.d("Result", builder.toString());
+		Log.d("Result", result.toString());
+		fListener.setListsReady();
 	}
 
 	public JSONArray getLists() {
@@ -82,4 +89,38 @@ public class ListsGetter extends AsyncTask<KipptAPIToken, Void, HttpResponse> {
 		this.fLists = fLists;
 	}
 
+	public class ListItem {
+		private String fName;
+		private int fId;
+		
+		public ListItem(String name, int id) {
+			fName = name;
+			fId = id;
+		}
+		
+		public int getId() {
+			return fId;
+		}
+		
+		@Override
+		public String toString() {
+			return fName;
+		}
+		
+	}
+
+	public ArrayList<ListItem> getListitems() {
+			ArrayList<ListItem> result = new ArrayList<ListItem>();
+			for(int i = 0; i < fLists.length(); i++) {
+				ListItem item;
+				try {
+					item = new ListItem(fLists.getJSONObject(i).getString("title"), fLists.getJSONObject(i).getInt("id"));
+				} catch (JSONException e) {
+					item = new ListItem("error",0);
+				}
+				result.add(item);
+			}
+			return result;
+	}
+	
 }

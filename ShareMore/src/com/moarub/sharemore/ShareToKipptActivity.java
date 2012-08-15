@@ -10,6 +10,10 @@
  ******************************************************************************/
 package com.moarub.sharemore;
 
+import java.util.List;
+
+import org.json.JSONObject;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -36,11 +40,14 @@ import android.widget.Toast;
 
 import com.moarub.kipptapi.ClipCreatedListener;
 import com.moarub.kipptapi.CreateClip;
+import com.moarub.kipptapi.ListsGetter;
+import com.moarub.kipptapi.ListsGetter.ListItem;
+import com.moarub.kipptapi.ListsListener;
 import com.moarub.util.UrlDeshortener;
 import com.moarub.util.UrlDeshortenerListener;
 
 public class ShareToKipptActivity extends Activity implements OnClickListener,
-		ClipCreatedListener, UrlDeshortenerListener {
+		ClipCreatedListener, UrlDeshortenerListener, ListsListener {
 	protected String fUrlShared;
 	protected String fTitle;
 	private TextView fTitleView;
@@ -49,6 +56,7 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
 	private CheckBox fReadLater;
 	private String fGeneratedNoteText;
 	private UrlDeshortener fUrlDeshortener;
+	private ListsGetter fListGetter;
 	private boolean fIgnoreShortening;
 
 	@Override
@@ -57,7 +65,32 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
 		setContentView(R.layout.activity_sahare_moar);
 
 		handleIntentInit();
+		getLists();
 		initViews();
+	}
+
+	private void getLists() {
+		if(isCachedLists()) {
+			fetctCachedLists();
+		}
+		fListGetter = new ListsGetter(this);
+		SharedPreferences preferences = PreferenceManager
+				.getDefaultSharedPreferences(getApplicationContext());
+		String apiTokStr = preferences.getString("kippt_token", "");
+		String apiTokUser = preferences.getString("kippt_username", "");
+
+		String[] params = { apiTokUser, apiTokStr };
+
+		fListGetter.execute(params);
+	}
+
+	private void fetctCachedLists() {
+		// TODO later
+	}
+
+	private boolean isCachedLists() {
+		// TODO later
+		return false;
 	}
 
 	private void initViews() {
@@ -67,16 +100,17 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
 		fTitleView = (TextView) findViewById(R.id.titleTextEditor);
 		fTitleView.setText(fTitle);
 
-		Spinner ps = (Spinner) findViewById(R.id.ls_spinner);
-		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
-				this, R.array.lists, R.layout.spinner_item_lists);
-		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		ps.setAdapter(adapter);
+		
 
 		fNoteView = (TextView) findViewById(R.id.editTextNotes);
 		if (fGeneratedNoteText != null) {
 			fNoteView.setText(fGeneratedNoteText);
 		}
+	}
+
+
+	private List<ListsGetter.ListItem> getListNames() {
+		return fListGetter.getListitems();
 	}
 
 	protected void handleIntentInit() {
@@ -276,6 +310,17 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
 			fTitleView.setText(newTitle);
 			fTitleView.invalidate();
 		}
+	}
+
+	@Override
+	public void setListsReady() {
+		Spinner ps = (Spinner) findViewById(R.id.ls_spinner);
+		//ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
+		//		this, R.array.lists, R.layout.spinner_item_lists);
+		ArrayAdapter<ListsGetter.ListItem> adapter = new ArrayAdapter<ListsGetter.ListItem>(this, R.layout.spinner_item_lists, getListNames());
+ 		
+		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		ps.setAdapter(adapter);
 	}
 
 }

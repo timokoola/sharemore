@@ -28,7 +28,7 @@ import com.moarub.util.ShareMoreUtils;
 import android.os.AsyncTask;
 import android.util.Log;
 
-public class KipptAPIToken extends AsyncTask<String, Void, HttpResponse> {
+public class KipptAPIToken extends AsyncTask<String, Void, StringBuilder> {
 	private String fToken;
 	private ApiTokenListener fListener;
 	private String fUserName;
@@ -40,7 +40,7 @@ public class KipptAPIToken extends AsyncTask<String, Void, HttpResponse> {
 	}
 	
 	@Override
-	protected HttpResponse doInBackground(String... u) {
+	protected StringBuilder doInBackground(String... u) {
 		String username = u[0];
 		String password = u[1];
 		DefaultHttpClient client = new DefaultHttpClient();
@@ -50,7 +50,8 @@ public class KipptAPIToken extends AsyncTask<String, Void, HttpResponse> {
         try {
             HttpGet request = new HttpGet(reqTokenUrl);
             
-			return client.execute(request);
+			HttpResponse response =  client.execute(request);
+			return ShareMoreUtils.getResponseString(response);
         } catch (ClientProtocolException e) {
         	Log.d("ApiTokenFailure", "Can't fetch API Token " + e.getMessage());
 			return null;
@@ -61,8 +62,10 @@ public class KipptAPIToken extends AsyncTask<String, Void, HttpResponse> {
 	}
 
 	@Override
-	protected void onPostExecute(HttpResponse result) {
-		StringBuilder builder = ShareMoreUtils.getResponseString(result);
+	protected void onPostExecute(StringBuilder builder) {
+		if(builder == null) {
+			return;
+		}
 		
 		try {
 			JSONObject jobj = (JSONObject) new JSONTokener(builder.toString()).nextValue();
