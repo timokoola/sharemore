@@ -36,6 +36,8 @@ public class CreateClip extends AsyncTask<String, Void, HttpResponse> {
 	private boolean fReadLater;
 	private boolean fStar;
 	private String fTitle;
+	private int fListId;
+	private String fListResourceUri;
 
 	public CreateClip(String clip, ClipCreatedListener listener) {
 		fClipUrl = clip;
@@ -76,6 +78,9 @@ public class CreateClip extends AsyncTask<String, Void, HttpResponse> {
 			}
 			if(fStar) {
 				job.put("is_starred", true);
+			} 
+			if(fListResourceUri != null) {
+				job.put("list", fListResourceUri);
 			}
 
 			StringEntity se = new StringEntity(job.toString(), "UTF-8");
@@ -116,5 +121,10 @@ public class CreateClip extends AsyncTask<String, Void, HttpResponse> {
 	public void setReadLater(boolean checked) {
 		fReadLater = checked;
 	}
+
+	public void addListUri(String fListUri) {
+		fListResourceUri = fListUri;
+	}
+
 
 }

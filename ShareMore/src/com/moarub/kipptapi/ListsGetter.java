@@ -91,11 +91,16 @@ public class ListsGetter extends AsyncTask<String, Void, StringBuilder> {
 
 	public class ListItem {
 		private String fName;
+		private String fResourceUri;
 		private int fId;
 		
 		public ListItem(String name, int id) {
 			fName = name;
 			fId = id;
+		}
+		
+		public void setResourceUri(String rUri) {
+			fResourceUri = rUri;
 		}
 		
 		public int getId() {
@@ -106,6 +111,10 @@ public class ListsGetter extends AsyncTask<String, Void, StringBuilder> {
 		public String toString() {
 			return fName;
 		}
+
+		public String getUri() {
+			return fResourceUri;
+		}
 		
 	}
 
@@ -115,6 +124,7 @@ public class ListsGetter extends AsyncTask<String, Void, StringBuilder> {
 				ListItem item;
 				try {
 					item = new ListItem(fLists.getJSONObject(i).getString("title"), fLists.getJSONObject(i).getInt("id"));
+					item.setResourceUri(fLists.getJSONObject(i).getString("resource_uri"));
 				} catch (JSONException e) {
 					item = new ListItem("error",0);
 				}

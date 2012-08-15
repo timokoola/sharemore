@@ -50,6 +50,7 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
 		ClipCreatedListener, UrlDeshortenerListener, ListsListener {
 	protected String fUrlShared;
 	protected String fTitle;
+	protected String fListUri;
 	private TextView fTitleView;
 	private TextView fNoteView;
 	private ConnectivityManager fConnectivityManager;
@@ -58,6 +59,7 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
 	private UrlDeshortener fUrlDeshortener;
 	private ListsGetter fListGetter;
 	private boolean fIgnoreShortening;
+	private Spinner fListSpinner;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -201,6 +203,7 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
 			fIgnoreShortening = true;
 		}
 		fTitle = fTitleView.getText().toString();
+		fListUri = fListSpinner.getSelectedItem() != null ? ((ListItem)fListSpinner.getSelectedItem()).getUri() : null;
 		doCreateClip(false, false);
 	}
 
@@ -208,6 +211,7 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
 		CreateClip cl = new CreateClip(fUrlShared, this);
 
 		cl.addTitle(fTitle);
+		cl.addListUri(fListUri);
 		if (fGeneratedNoteText != null) {
 			cl.addNote(fGeneratedNoteText);
 		}
@@ -314,13 +318,13 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
 
 	@Override
 	public void setListsReady() {
-		Spinner ps = (Spinner) findViewById(R.id.ls_spinner);
+		fListSpinner = (Spinner) findViewById(R.id.ls_spinner);
 		//ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
 		//		this, R.array.lists, R.layout.spinner_item_lists);
 		ArrayAdapter<ListsGetter.ListItem> adapter = new ArrayAdapter<ListsGetter.ListItem>(this, R.layout.spinner_item_lists, getListNames());
  		
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		ps.setAdapter(adapter);
+		fListSpinner.setAdapter(adapter);
 	}
 
 }
