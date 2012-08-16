@@ -18,7 +18,6 @@ import java.io.InputStreamReader;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 
-import android.os.AsyncTask;
 import android.util.Log;
 
 public class ShareMoreUtils {

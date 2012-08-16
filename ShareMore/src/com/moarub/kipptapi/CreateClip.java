@@ -23,8 +23,6 @@ import org.apache.http.protocol.HTTP;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.moarub.util.ShareMoreUtils;
-
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -36,7 +34,6 @@ public class CreateClip extends AsyncTask<String, Void, HttpResponse> {
 	private boolean fReadLater;
 	private boolean fStar;
 	private String fTitle;
-	private int fListId;
 	private String fListResourceUri;
 
 	public CreateClip(String clip, ClipCreatedListener listener) {

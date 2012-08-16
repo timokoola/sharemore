@@ -22,31 +22,36 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-import com.moarub.kipptapi.ListsGetter.ListItem;
-import com.moarub.util.ShareMoreUtils;
-
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
+
+import com.moarub.db.ListItem;
+import com.moarub.db.ListsDataSource;
+import com.moarub.util.ShareMoreUtils;
 
 public class ListsGetter extends AsyncTask<String, Void, StringBuilder> {
 	private JSONArray fLists;
 	private ListsListener fListener;
+	private ListsDataSource fDataSource;
 
-	public ListsGetter(ListsListener listener) {
+	public ListsGetter(ListsListener listener, Context context) {
 		fListener = listener;
+		fDataSource = new ListsDataSource(context);
+		fDataSource.open();
 	}
-	
+
 	@Override
 	protected StringBuilder doInBackground(String... params) {
 		String username = params[0];
-		String password = params[1];
+		String token = params[1];
 		String reqTokenUrl = "https://kippt.com/api/lists/";
 		DefaultHttpClient client = new DefaultHttpClient();
 
 		try {
 			HttpGet request = new HttpGet(reqTokenUrl);
 			request.addHeader("X-Kippt-Username", username);
-			request.addHeader("X-Kippt-API-Token", password);
+			request.addHeader("X-Kippt-API-Token", token);
 
 			HttpResponse lists = client.execute(request);
 			return ShareMoreUtils.getResponseString(lists);
@@ -64,15 +69,14 @@ public class ListsGetter extends AsyncTask<String, Void, StringBuilder> {
 		try {
 			JSONObject jobj = (JSONObject) new JSONTokener(result.toString())
 					.nextValue();
-			
+
 			setLists(jobj.getJSONArray("objects"));
-			
-			for(int i = 0; i < fLists.length(); i++) {
+
+			for (int i = 0; i < fLists.length(); i++) {
 				JSONObject job = fLists.getJSONObject(i);
 				Log.d("ListsGetter", job.getString("app_url"));
 			}
-			
-			
+
 		} catch (JSONException e) {
 			Log.d("ApiTokenFailure", "Can't fetch API Token");
 			return;
@@ -85,52 +89,36 @@ public class ListsGetter extends AsyncTask<String, Void, StringBuilder> {
 		return fLists;
 	}
 
-	public void setLists(JSONArray fLists) {
-		this.fLists = fLists;
-	}
-
-	public class ListItem {
-		private String fName;
-		private String fResourceUri;
-		private int fId;
-		
-		public ListItem(String name, int id) {
-			fName = name;
-			fId = id;
+	public void setLists(JSONArray lists) {
+		fLists = lists;
+		for (ListItem li : getListitems()) {
+			fDataSource.createList(li.toString(), li.getUri());
 		}
-		
-		public void setResourceUri(String rUri) {
-			fResourceUri = rUri;
-		}
-		
-		public int getId() {
-			return fId;
-		}
-		
-		@Override
-		public String toString() {
-			return fName;
-		}
-
-		public String getUri() {
-			return fResourceUri;
-		}
-		
 	}
 
 	public ArrayList<ListItem> getListitems() {
-			ArrayList<ListItem> result = new ArrayList<ListItem>();
-			for(int i = 0; i < fLists.length(); i++) {
-				ListItem item;
-				try {
-					item = new ListItem(fLists.getJSONObject(i).getString("title"), fLists.getJSONObject(i).getInt("id"));
-					item.setResourceUri(fLists.getJSONObject(i).getString("resource_uri"));
-				} catch (JSONException e) {
-					item = new ListItem("error",0);
-				}
-				result.add(item);
+		ArrayList<ListItem> result = new ArrayList<ListItem>();
+		for (int i = 0; i < fLists.length(); i++) {
+			ListItem item;
+			try {
+				item = new ListItem(fLists.getJSONObject(i).getString("title"),
+						fLists.getJSONObject(i).getInt("id"));
+				item.setResourceUri(fLists.getJSONObject(i).getString(
+						"resource_uri"));
+			} catch (JSONException e) {
+				item = new ListItem("error", 0);
 			}
-			return result;
+			result.add(item);
+		}
+		return result;
 	}
-	
+
+	public ArrayList<ListItem> getCachedListItems() {
+		return fDataSource.getAllLists();
+	}
+
+	public boolean isCachedListItems() {
+		return fDataSource.getAllLists().size() > 0;
+	}
+
 }

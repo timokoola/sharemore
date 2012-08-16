@@ -34,5 +34,6 @@
     <string name="authentication_failed_password_changed">Authentication failed, password changed?</string>
     <string name="no_url_found_in_the_shared_text">No URL found in the shared text</string>
     <string name="star_item">Star</string>
+    <string name="ua_string_for_kippt">ShareMore for Android,sharemore@moarub.com,http://moarub.com/sharemore</string>
 
 </resources>

@@ -12,8 +12,6 @@ package com.moarub.sharemore;
 
 import java.util.List;
 
-import org.json.JSONObject;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -23,7 +21,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.provider.ContactsContract.CommonDataKinds.Note;
 import android.text.Editable;
 import android.text.style.URLSpan;
 import android.text.util.Linkify;
@@ -32,16 +29,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.moarub.db.ListItem;
 import com.moarub.kipptapi.ClipCreatedListener;
 import com.moarub.kipptapi.CreateClip;
 import com.moarub.kipptapi.ListsGetter;
-import com.moarub.kipptapi.ListsGetter.ListItem;
 import com.moarub.kipptapi.ListsListener;
 import com.moarub.util.UrlDeshortener;
 import com.moarub.util.UrlDeshortenerListener;
@@ -55,7 +50,7 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
 	private TextView fNoteView;
 	private ConnectivityManager fConnectivityManager;
 	private String fGeneratedNoteText;
-	private UrlDeshortener fUrlDeshortener;
+	protected UrlDeshortener fUrlDeshortener;
 	private ListsGetter fListGetter;
 	private boolean fIgnoreShortening;
 	private Spinner fListSpinner;
@@ -73,10 +68,10 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
 	}
 
 	private void getLists() {
-		if(isCachedLists()) {
-			fetctCachedLists();
+		fListGetter = new ListsGetter(this, this);
+		if (isCachedLists()) {
+			setupSpinner(fListGetter.getCachedListItems());
 		}
-		fListGetter = new ListsGetter(this);
 		SharedPreferences preferences = PreferenceManager
 				.getDefaultSharedPreferences(getApplicationContext());
 		String apiTokStr = preferences.getString("kippt_token", "");
@@ -87,13 +82,8 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
 		fListGetter.execute(params);
 	}
 
-	private void fetctCachedLists() {
-		// TODO later
-	}
-
 	private boolean isCachedLists() {
-		// TODO later
-		return false;
+		return fListGetter.isCachedListItems();
 	}
 
 	private void initViews() {
@@ -103,16 +93,13 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
 		fTitleView = (TextView) findViewById(R.id.titleTextEditor);
 		fTitleView.setText(fTitle);
 
-		
-
 		fNoteView = (TextView) findViewById(R.id.editTextNotes);
 		if (fGeneratedNoteText != null) {
 			fNoteView.setText(fGeneratedNoteText);
 		}
 	}
 
-
-	private List<ListsGetter.ListItem> getListNames() {
+	private List<ListItem> getListNames() {
 		return fListGetter.getListitems();
 	}
 
@@ -128,7 +115,7 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
 
 		if (fUrlShared == null) {
 			finishWithError(R.string.no_url_found_in_the_shared_text);
-		} else if(fUrlShared.length() < 27) {
+		} else if (fUrlShared.length() < 27) {
 			fUrlDeshortener = new UrlDeshortener(this);
 			fUrlDeshortener.execute(fUrlShared);
 		}
@@ -154,7 +141,7 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
 			}
 			URLSpan uspan = urls[0];
 			fGeneratedNoteText = urlCandidate;
-			
+
 			return uspan.getURL();
 		}
 
@@ -199,12 +186,13 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
 	}
 
 	protected void createClip() {
-		if(fUrlDeshortener != null) {
+		if (fUrlDeshortener != null) {
 			fUrlDeshortener.cancel(true);
 			fIgnoreShortening = true;
 		}
 		fTitle = fTitleView.getText().toString();
-		fListUri = fListSpinner.getSelectedItem() != null ? ((ListItem)fListSpinner.getSelectedItem()).getUri() : null;
+		fListUri = fListSpinner.getSelectedItem() != null ? ((ListItem) fListSpinner
+				.getSelectedItem()).getUri() : null;
 		doCreateClip(fReadLater, fStar);
 	}
 
@@ -285,8 +273,8 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
 		switch (item.getItemId()) {
 		case R.id.menu_read_later: {
 			return item.isChecked() ? getResources().getDrawable(
-					R.drawable.ic_action_glasses_white) : getResources().getDrawable(
-					R.drawable.ic_action_glasses_gray);
+					R.drawable.ic_action_glasses_white) : getResources()
+					.getDrawable(R.drawable.ic_action_glasses_gray);
 		}
 		case R.id.menu_star: {
 			return item.isChecked() ? getResources().getDrawable(
@@ -300,20 +288,24 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
 
 	@Override
 	public void onURLDeshortened(String resolution, int responseCode) {
-		if(resolution != null && !fIgnoreShortening) {
+		if (resolution != null && !fIgnoreShortening) {
 			fUrlShared = resolution;
 			TextView urlView = (TextView) findViewById(R.id.urlTextEditor);
-			urlView.setText(fUrlShared);
-			if(responseCode > 399) {
+			if (urlView != null) {
+				urlView.setText(fUrlShared);
+				urlView.invalidate();
+			}
+			if (responseCode > 399) {
+				fUrlDeshortener.cancel(true);
 				fUrlDeshortener = null;
 			}
-			urlView.invalidate();
- 		}
+
+		}
 	}
 
 	@Override
 	public void onTitleUpdate(String newTitle) {
-		if(newTitle != null && !fIgnoreShortening) {
+		if (newTitle != null && !fIgnoreShortening) {
 			fTitleView.setText(newTitle);
 			fTitleView.invalidate();
 		}
@@ -321,11 +313,16 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
 
 	@Override
 	public void setListsReady() {
+		setupSpinner(getListNames());
+	}
+
+	private void setupSpinner(List<ListItem> l) {
 		fListSpinner = (Spinner) findViewById(R.id.ls_spinner);
-		//ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
-		//		this, R.array.lists, R.layout.spinner_item_lists);
-		ArrayAdapter<ListsGetter.ListItem> adapter = new ArrayAdapter<ListsGetter.ListItem>(this, R.layout.spinner_item_lists, getListNames());
- 		
+		// ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
+		// this, R.array.lists, R.layout.spinner_item_lists);
+		ArrayAdapter<ListItem> adapter = new ArrayAdapter<ListItem>(this,
+				R.layout.spinner_item_lists, l);
+
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		fListSpinner.setAdapter(adapter);
 		fListSpinner.setSelection(0);
