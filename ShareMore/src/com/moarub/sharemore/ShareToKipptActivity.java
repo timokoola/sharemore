@@ -325,6 +325,7 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
  		
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		fListSpinner.setAdapter(adapter);
+		fListSpinner.setSelection(0);
 	}
 
 }
