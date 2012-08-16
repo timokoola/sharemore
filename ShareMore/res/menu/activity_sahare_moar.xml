@@ -19,7 +19,7 @@
         android:id="@+id/menu_star"
         android:checkable="true"
         android:checked="true"
-        android:icon="@drawable/ic_action_star_10"
+        android:icon="@drawable/ic_action_star_0"
         android:showAsAction="ifRoom"
         android:title="Star"
         android:titleCondensed="Star">

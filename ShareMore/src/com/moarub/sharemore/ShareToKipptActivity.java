@@ -54,12 +54,13 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
 	private TextView fTitleView;
 	private TextView fNoteView;
 	private ConnectivityManager fConnectivityManager;
-	private CheckBox fReadLater;
 	private String fGeneratedNoteText;
 	private UrlDeshortener fUrlDeshortener;
 	private ListsGetter fListGetter;
 	private boolean fIgnoreShortening;
 	private Spinner fListSpinner;
+	private boolean fStar;
+	private boolean fReadLater;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -204,7 +205,7 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
 		}
 		fTitle = fTitleView.getText().toString();
 		fListUri = fListSpinner.getSelectedItem() != null ? ((ListItem)fListSpinner.getSelectedItem()).getUri() : null;
-		doCreateClip(false, false);
+		doCreateClip(fReadLater, fStar);
 	}
 
 	public void doCreateClip(boolean readLater, boolean star) {
@@ -262,11 +263,13 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
 		case R.id.menu_read_later: {
 			item.setChecked(!item.isChecked());
 			item.setIcon(getIcon(item));
+			fReadLater = item.isChecked();
 			return true;
 		}
 		case R.id.menu_star: {
 			item.setChecked(!item.isChecked());
 			item.setIcon(getIcon(item));
+			fStar = item.isChecked();
 			return true;
 		}
 		case R.id.menu_send: {
@@ -282,7 +285,7 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
 		switch (item.getItemId()) {
 		case R.id.menu_read_later: {
 			return item.isChecked() ? getResources().getDrawable(
-					R.drawable.ic_action_glasses) : getResources().getDrawable(
+					R.drawable.ic_action_glasses_white) : getResources().getDrawable(
 					R.drawable.ic_action_glasses_gray);
 		}
 		case R.id.menu_star: {
