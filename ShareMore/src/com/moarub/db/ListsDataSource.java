@@ -68,7 +68,6 @@ public class ListsDataSource {
 			Lists.add(l);
 			cursor.moveToNext();
 		}
-		// Make sure to close the cursor
 		cursor.close();
 		return Lists;
 	}

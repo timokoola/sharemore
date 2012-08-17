@@ -19,24 +19,29 @@ import android.net.http.AndroidHttpClient;
 import android.os.AsyncTask;
 import android.util.Log;
 
-public class UrlDeshortener extends AsyncTask<String, Void, HttpResponse> {
+public class UrlDeshortener extends AsyncTask<String, Void, DeshorteningResult> {
 	private UrlDeshortenerListener fListener;
-	private String fUrlTo; 
-	
+	private String fUrlTo;
+
 	public UrlDeshortener(UrlDeshortenerListener listener) {
 		fListener = listener;
 	}
-	
+
 	@Override
-	protected HttpResponse doInBackground(String... urls) {
+	protected DeshorteningResult doInBackground(String... urls) {
 		Log.d("Deshortening", "URL " + urls[0]);
 		fUrlTo = urls[0];
-		AndroidHttpClient httpClient = AndroidHttpClient.newInstance("Android ShareMore");
-		
+		AndroidHttpClient httpClient = AndroidHttpClient
+				.newInstance("Android ShareMore");
+
 		HttpHead headReq = new HttpHead(fUrlTo);
-		
+
 		try {
-			return httpClient.execute(headReq);
+			HttpResponse resp = httpClient.execute(headReq);
+			String resValue = resp.getLastHeader("Location") != null ? resp
+					.getLastHeader("Location").getValue() : null;
+			int statusCode = resp.getStatusLine().getStatusCode();
+			return new DeshorteningResult(resValue, statusCode);
 		} catch (IOException e) {
 			Log.d("Deshortening", e.getMessage());
 			return null;
@@ -46,21 +51,19 @@ public class UrlDeshortener extends AsyncTask<String, Void, HttpResponse> {
 	}
 
 	@Override
-	protected void onPostExecute(HttpResponse result) {
-		if(result != null && result.containsHeader("Location")) {
+	protected void onPostExecute(DeshorteningResult result) {
+		if(result != null && result.getResValue() != null) {
 			
-			String resValue = result.getLastHeader("Location").getValue();
-			int statusCode = result.getStatusLine().getStatusCode();
-			fListener.onURLDeshortened(resValue,statusCode);
-			Log.d("Deshortening", resValue + " (" + statusCode + ")");
+			fListener.onURLDeshortened(result.getResValue(),result.getStatusCode());
+			Log.d("Deshortening", result.getResValue() + " (" + result.getStatusCode() + ")");
 			
-			if(statusCode >= 300 && statusCode < 400) {
+			if(result.getStatusCode() >= 300 && result.getStatusCode()  < 400) {
 				UrlDeshortener followOn = new UrlDeshortener(fListener);
-				followOn.execute(resValue);
+				followOn.execute(result.getResValue());
 			}
 			return;
 		} else if(result != null) {
-			int statusCode = result.getStatusLine().getStatusCode();
+			int statusCode = result.getStatusCode();
 			if(statusCode >= 200 && statusCode < 300 && fUrlTo != null) {
 				extractTitle(fUrlTo);
 			}
@@ -73,5 +76,5 @@ public class UrlDeshortener extends AsyncTask<String, Void, HttpResponse> {
 		PageTitleGetter pgt = new PageTitleGetter(fListener);
 		pgt.execute(url);
 	}
-	
+
 }
