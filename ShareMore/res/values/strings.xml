@@ -19,7 +19,8 @@
     <string name="notes">Notes</string>
     <string name="share_to_kippt">Share to Kippt</string>
     <string name="title">Title</string>
-    <string name="clip_created">Added to Kippt</string>
+    <string name="saving">Saving</string>
+    <string name="clip_created">Saved to Kippt</string>
     <string name="inet_not_available">No Internet Connection</string>
     <string name="readlater">Read Later</string>
     <string name="password_not_stored">Password is not stored</string>

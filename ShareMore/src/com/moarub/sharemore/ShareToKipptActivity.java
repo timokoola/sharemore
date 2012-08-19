@@ -127,7 +127,7 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
 		}
 	}
 
-	private String cleanAndLinkify(Bundle extras) {
+	public String cleanAndLinkify(Bundle extras) {
 		String urlCandidate = extras.getString("android.intent.extra.TEXT");
 		if (urlCandidate != null && urlCandidate.startsWith("http://")) {
 			return urlCandidate;
@@ -304,7 +304,7 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
 	}
 
 	@Override
-	public void onTitleUpdate(String newTitle) {
+	public void onTitleUpdate(String newTitle,String url) {
 		if (newTitle != null && !fIgnoreShortening) {
 			fTitleView.setText(newTitle);
 			fTitleView.invalidate();

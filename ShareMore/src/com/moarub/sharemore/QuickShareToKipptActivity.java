@@ -10,20 +10,29 @@
  ******************************************************************************/
 package com.moarub.sharemore;
 
-import com.moarub.sharemore.R;
-
+import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.Menu;
+import android.widget.Toast;
 
-public class QuickShareToKipptActivity extends ShareToKipptActivity {
+public class QuickShareToKipptActivity extends Activity {
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.empty_layout);
-		handleIntentInit();
+		fetchAPITokens();
+		Toast.makeText(getApplicationContext(), R.string.saving,
+				Toast.LENGTH_SHORT).show();
+		Intent intent = getIntent();
+		
+		Intent service = new Intent(this, QuickSaveToKipptService.class);
+		service.putExtras(intent);
+		service.setType(intent.getType());
+		startService(service);
+		finish();
 	}
 
 	@Override
@@ -31,23 +40,22 @@ public class QuickShareToKipptActivity extends ShareToKipptActivity {
 		return false;
 	}
 	
-	@Override
-	public void setListsReady() {
-		// Do nothing, on purpose
-	}
-	
-	@Override
-	public void onTitleUpdate(String newTitle) {
-		if(fUrlDeshortener != null) {
-			fUrlDeshortener.cancel(true);
-			fUrlDeshortener = null;
-		}
-		fTitle = newTitle;
+	private void fetchAPITokens() {
 		SharedPreferences preferences = PreferenceManager
 				.getDefaultSharedPreferences(getApplicationContext());
-		doCreateClip(preferences.getBoolean("quick_read_later", false), preferences.getBoolean("quick_star", false));
+		String apiTokStr = preferences.getString("kippt_token", "");
 
+		if (apiTokStr.equalsIgnoreCase("apitoken")
+				|| apiTokStr.equalsIgnoreCase("")) {
+			callLoginActivity();
+		}
 	}
+
+	private void callLoginActivity() {
+		Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+		startActivityForResult(intent, 700);
+	}
+
 	
 	
 }

@@ -66,6 +66,7 @@
             android:label="Sign in"
             android:screenOrientation="portrait" >
         </activity>
+        <service android:name=".QuickSaveToKipptService"></service>
     </application>
 
 </manifest>

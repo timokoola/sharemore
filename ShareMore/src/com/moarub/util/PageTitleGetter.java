@@ -23,6 +23,7 @@ import android.util.Log;
 
 public class PageTitleGetter extends AsyncTask<String, Void, StringBuilder> {
 	private UrlDeshortenerListener fListener;
+	private String fURLTo;
 
 	public PageTitleGetter(UrlDeshortenerListener listener) {
 		fListener = listener;
@@ -31,11 +32,11 @@ public class PageTitleGetter extends AsyncTask<String, Void, StringBuilder> {
 	@Override
 	protected StringBuilder doInBackground(String... urls) {
 		Log.d("Resolving title", "URL " + urls[0]);
-		String urlTo = urls[0];
+		fURLTo = urls[0];
 		AndroidHttpClient httpClient = AndroidHttpClient
 				.newInstance("Android ShareMore");
 
-		HttpGet headReq = new HttpGet(urlTo);
+		HttpGet headReq = new HttpGet(fURLTo);
 
 		try {
 			HttpResponse result = httpClient.execute(headReq);
@@ -57,7 +58,7 @@ public class PageTitleGetter extends AsyncTask<String, Void, StringBuilder> {
 				Pattern titleP = Pattern.compile("<title>(.*?)</title>");
 				Matcher m = titleP.matcher(newTitle);
 				while(m.find()) {
-					fListener.onTitleUpdate(m.group(1).trim());
+					fListener.onTitleUpdate(m.group(1).trim(),fURLTo);
 				}
 		}
 	}
