@@ -16,6 +16,7 @@ import java.util.regex.Pattern;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.params.HttpClientParams;
 
 import android.net.http.AndroidHttpClient;
 import android.os.AsyncTask;
@@ -24,17 +25,29 @@ import android.util.Log;
 public class PageTitleGetter extends AsyncTask<String, Void, StringBuilder> {
 	private UrlDeshortenerListener fListener;
 	private String fURLTo;
+	private String fBackupTitle;
 
 	public PageTitleGetter(UrlDeshortenerListener listener) {
 		fListener = listener;
 	}
+	
+	public void runOutsideUiThread(String urls) {
+		saveTitle(doGetTitle(urls));
+	}
+	
 
 	@Override
 	protected StringBuilder doInBackground(String... urls) {
-		Log.d("Resolving title", "URL " + urls[0]);
-		fURLTo = urls[0];
+		return doGetTitle(urls);
+	}
+
+	private StringBuilder doGetTitle(String... params) {
+		Log.d("Resolving title", "URL " + params[0]);
+		fURLTo = params[0];
+		fBackupTitle = params[1];
 		AndroidHttpClient httpClient = AndroidHttpClient
 				.newInstance("Android ShareMore");
+		HttpClientParams.setRedirecting(httpClient.getParams(), true);
 
 		HttpGet headReq = new HttpGet(fURLTo);
 
@@ -51,15 +64,21 @@ public class PageTitleGetter extends AsyncTask<String, Void, StringBuilder> {
 
 	@Override
 	protected void onPostExecute(StringBuilder result) {
+		saveTitle(result);
+	}
+
+	private void saveTitle(StringBuilder result) {
 		Log.d("Resolving title", "Ready");
 		if (result != null) {
 				String newTitle = result.toString();
 				newTitle.replaceAll("\\s+", " ");
-				Pattern titleP = Pattern.compile("<title>(.*?)</title>");
+				Pattern titleP = Pattern.compile("<title>(.*?)</title>",Pattern.CASE_INSENSITIVE);
 				Matcher m = titleP.matcher(newTitle);
 				while(m.find()) {
 					fListener.onTitleUpdate(m.group(1).trim(),fURLTo);
 				}
+		} else {
+			fListener.onTitleUpdate(null,fURLTo);
 		}
 	}
 

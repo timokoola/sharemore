@@ -49,8 +49,17 @@ public class CreateClip extends AsyncTask<String, Void, HttpResponse> {
 		fTitle = title;
 	}
 
+	public void runOutsideUiThread(String... params){
+		doHandleResult(doCreateClip(params));
+	}
+	
+	
 	@Override
 	protected HttpResponse doInBackground(String... params) {
+		return doCreateClip(params);
+	}
+
+	private HttpResponse doCreateClip(String... params) {
 		String username = params[0];
 		String token = params[1];
 		String reqTokenUrl = "https://kippt.com/api/clips/";
@@ -104,6 +113,10 @@ public class CreateClip extends AsyncTask<String, Void, HttpResponse> {
 
 	@Override
 	protected void onPostExecute(HttpResponse result) {
+		doHandleResult(result);
+	}
+
+	private void doHandleResult(HttpResponse result) {
 		StatusLine sl = result.getStatusLine();
 
 		Log.d("CreateClip", sl.getStatusCode() + " " + sl.getReasonPhrase());

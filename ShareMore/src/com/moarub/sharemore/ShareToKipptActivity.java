@@ -116,7 +116,7 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
 		if (fUrlShared == null) {
 			finishWithError(R.string.no_url_found_in_the_shared_text);
 		} else if (fUrlShared.length() < 27) {
-			fUrlDeshortener = new UrlDeshortener(this);
+			fUrlDeshortener = new UrlDeshortener(this,0);
 			fUrlDeshortener.execute(fUrlShared);
 		}
 

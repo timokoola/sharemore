@@ -1,5 +1,7 @@
 package com.moarub.sharemore;
 
+import java.util.Stack;
+
 import com.moarub.kipptapi.ClipCreatedListener;
 import com.moarub.kipptapi.CreateClip;
 import com.moarub.util.UrlDeshortener;
@@ -16,6 +18,7 @@ import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.style.URLSpan;
 import android.text.util.Linkify;
+import android.util.Log;
 import android.widget.Toast;
 
 public class QuickSaveToKipptService extends IntentService implements
@@ -25,6 +28,16 @@ public class QuickSaveToKipptService extends IntentService implements
 	private UrlDeshortener fUrlDeshortener;
 	private String fGeneratedNoteText;
 	private ConnectivityManager fConnectivityManager;
+	
+	
+	public static class UrlItem {
+		public String fUrl;
+		public String fTitle;
+		public String fNoteText;
+	}
+	
+	private Stack<UrlItem> fUrlItems = new Stack<QuickSaveToKipptService.UrlItem>();
+	
 
 	public QuickSaveToKipptService() {
 		super("SaveToKipptService");
@@ -48,13 +61,29 @@ public class QuickSaveToKipptService extends IntentService implements
 		if (fUrls != null) {
 
 			for (int i1 = 0; i1 < fUrls.length; i1++) {
-				fUrlDeshortener = new UrlDeshortener(this);
-				fUrlDeshortener.execute(fUrls[i1].getURL());
+				UrlItem ui = new UrlItem();
+				ui.fNoteText = fGeneratedNoteText;
+				ui.fUrl = fUrls[i1].getURL();
+				ui.fTitle = fTitle;
+				fUrlItems.push(ui);
 			}
+			
+			handleOneItem();
+			
 		} else {
 			createClip(fTitle, urlCandidate);
 		}
 
+	}
+
+	private void handleOneItem() {
+		if(fUrlItems.size() == 0) {
+			stopSelf();
+			return;
+		}
+		UrlItem ui = fUrlItems.pop();
+		UrlDeshortener ushort = new UrlDeshortener(this, 0);
+		ushort.execute(ui.fUrl);
 	}
 
 	private void finishWithError(int resId) {
@@ -129,7 +158,7 @@ public class QuickSaveToKipptService extends IntentService implements
 			Toast.makeText(getApplicationContext(),
 					R.string.error_creation + code, Toast.LENGTH_LONG).show();
 		}
-
+		handleOneItem();
 	}
 
 }
