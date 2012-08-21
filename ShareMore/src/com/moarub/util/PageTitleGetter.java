@@ -74,8 +74,10 @@ public class PageTitleGetter extends AsyncTask<String, Void, StringBuilder> {
 				newTitle.replaceAll("\\s+", " ");
 				Pattern titleP = Pattern.compile("<title>(.*?)</title>",Pattern.CASE_INSENSITIVE);
 				Matcher m = titleP.matcher(newTitle);
-				while(m.find()) {
+				if(m.find()) {
 					fListener.onTitleUpdate(m.group(1).trim(),fURLTo);
+				} else {
+					fListener.onTitleUpdate(null,fURLTo);
 				}
 		} else {
 			fListener.onTitleUpdate(null,fURLTo);

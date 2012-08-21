@@ -78,7 +78,6 @@ public class QuickSaveToKipptService extends IntentService implements
 
 	private void handleOneItem() {
 		if(fUrlItems.size() == 0) {
-			stopSelf();
 			return;
 		}
 		UrlItem ui = fUrlItems.pop();
@@ -118,7 +117,7 @@ public class QuickSaveToKipptService extends IntentService implements
 
 	@Override
 	public void onURLDeshortened(String resolution, int responseCode) {
-		if (responseCode > 399) {
+		if (responseCode > 399 && fUrlDeshortener != null) {
 			fUrlDeshortener.cancel(true);
 			fUrlDeshortener = null;
 		}
