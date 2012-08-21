@@ -23,11 +23,16 @@ public class QuickShareToKipptActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		try {
+			Class.forName("android.os.AsyncTask");
+		} catch (ClassNotFoundException e) {
+		} // Hack, see
+			// http://stackoverflow.com/questions/4280330/onpostexecute-not-being-called-in-asynctask-handler-runtime-exception
 		fetchAPITokens();
 		Toast.makeText(getApplicationContext(), R.string.saving,
 				Toast.LENGTH_SHORT).show();
 		Intent intent = getIntent();
-		
+
 		Intent service = new Intent(this, QuickSaveToKipptService.class);
 		service.putExtras(intent);
 		service.setType(intent.getType());
@@ -39,7 +44,7 @@ public class QuickShareToKipptActivity extends Activity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		return false;
 	}
-	
+
 	private void fetchAPITokens() {
 		SharedPreferences preferences = PreferenceManager
 				.getDefaultSharedPreferences(getApplicationContext());
@@ -56,6 +61,4 @@ public class QuickShareToKipptActivity extends Activity {
 		startActivityForResult(intent, 700);
 	}
 
-	
-	
 }

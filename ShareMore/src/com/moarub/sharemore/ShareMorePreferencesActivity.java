@@ -16,14 +16,11 @@ import android.os.Bundle;
 public class ShareMorePreferencesActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		try {
-			Class.forName("android.os.AsyncTask");
-		} catch (ClassNotFoundException e) {
-		} // Hack
 		super.onCreate(savedInstanceState);
-		getFragmentManager().beginTransaction().replace(android.R.id.content, new ShareMorePreferenceFragment())
-        .commit();
+		getFragmentManager()
+				.beginTransaction()
+				.replace(android.R.id.content,
+						new ShareMorePreferenceFragment()).commit();
 	}
-	
-	
+
 }
