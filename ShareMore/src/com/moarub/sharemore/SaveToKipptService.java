@@ -21,7 +21,7 @@ import android.text.util.Linkify;
 import android.util.Log;
 import android.widget.Toast;
 
-public class QuickSaveToKipptService extends IntentService implements
+public class SaveToKipptService extends IntentService implements
 		UrlDeshortenerListener, ClipCreatedListener {
 	private URLSpan[] fUrls;
 	private String fTitle;
@@ -36,10 +36,10 @@ public class QuickSaveToKipptService extends IntentService implements
 		public String fNoteText;
 	}
 	
-	private Stack<UrlItem> fUrlItems = new Stack<QuickSaveToKipptService.UrlItem>();
+	private Stack<UrlItem> fUrlItems = new Stack<SaveToKipptService.UrlItem>();
 	
 
-	public QuickSaveToKipptService() {
+	public SaveToKipptService() {
 		super("SaveToKipptService");
 	}
 
@@ -51,10 +51,14 @@ public class QuickSaveToKipptService extends IntentService implements
 				&& i.getType().equalsIgnoreCase("text/plain")) {
 			Bundle extras = i.getExtras();
 			urlCandidate = extras.getString("android.intent.extra.TEXT");
-			fUrls = cleanAndLinkify(urlCandidate);
+			fUrls = cleanAndLinkify(" " + urlCandidate);
 			if (fUrls == null && urlCandidate == null) {
 				finishWithError(R.string.no_url_found_in_the_shared_text);
+			} 
+			if(fUrls != null) {
+				fGeneratedNoteText = urlCandidate;
 			}
+			
 			fTitle = extras.getString("android.intent.extra.SUBJECT");
 		}
 
@@ -102,7 +106,6 @@ public class QuickSaveToKipptService extends IntentService implements
 			if (urls == null || urls.length < 1) {
 				return null;
 			}
-			fGeneratedNoteText = urlCandidate;
 
 			return urls;
 		}

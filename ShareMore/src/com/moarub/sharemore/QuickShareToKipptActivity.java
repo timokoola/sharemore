@@ -33,7 +33,7 @@ public class QuickShareToKipptActivity extends Activity {
 				Toast.LENGTH_SHORT).show();
 		Intent intent = getIntent();
 
-		Intent service = new Intent(this, QuickSaveToKipptService.class);
+		Intent service = new Intent(this, SaveToKipptService.class);
 		service.putExtras(intent);
 		service.setType(intent.getType());
 		startService(service);
