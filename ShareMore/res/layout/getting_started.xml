@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center_horizontal|center_vertical"
-    android:orientation="vertical"
-    tools:context=".GettingStartedActivity" >
+    android:orientation="vertical" android:id="@+id/getting_started_ll"
+    tools:context=".GettingStartedActivity"  >
 
 </LinearLayout>

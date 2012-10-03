@@ -55,16 +55,19 @@
             android:name=".ShareMorePreferencesActivity"
             android:label="ShareMore"
             android:screenOrientation="portrait" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+        
         </activity>
            <activity
             android:name=".LoginActivity"
             android:label="Sign in"
             android:screenOrientation="portrait" >
+        </activity>
+        <activity android:name=".GettingStartedActivity" android:label="ShareMore" android:screenOrientation="portrait" android:theme="@android:style/Theme.Holo.Light.NoActionBar.Fullscreen">
+                <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
         <service android:name=".SaveToKipptService"></service>
     </application>
