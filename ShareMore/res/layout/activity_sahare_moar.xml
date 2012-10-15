@@ -15,6 +15,7 @@
     tools:context=".ShareMoarActivity" >
 
     <LinearLayout
+        android:id="@+id/sharemoresavetokippt"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical" >
@@ -62,14 +63,10 @@
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textSize="@dimen/title_text_size_share" />
 
-        <EditText
-            android:id="@+id/urlTextEditor"
+        <Spinner
+            android:id="@+id/urlspinner"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="text|textMultiLine|textImeMultiLine|textNoSuggestions"
-            android:textSize="6pt" >
-        </EditText>
+            android:layout_height="wrap_content" />
         
          <TextView
             android:id="@+id/textViewNotes"

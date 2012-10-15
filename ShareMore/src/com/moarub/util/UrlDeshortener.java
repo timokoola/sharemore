@@ -68,7 +68,7 @@ public class UrlDeshortener extends AsyncTask<String, Void, DeshorteningResult> 
 		if (result != null && result.getResValue() != null && fRedirects < 20) {
 
 			fListener.onURLDeshortened(result.getResValue(),
-					result.getStatusCode());
+					result.getStatusCode(), fUrlTo);
 			Log.d("Deshortening",
 					result.getResValue() + " (" + result.getStatusCode() + ")");
 
@@ -84,7 +84,7 @@ public class UrlDeshortener extends AsyncTask<String, Void, DeshorteningResult> 
 			}
 			return;
 		}
-		fListener.onURLDeshortened(null, 700);
+		fListener.onURLDeshortened(null, 700, fUrlTo);
 	}
 
 	private void extractTitle(String url) {

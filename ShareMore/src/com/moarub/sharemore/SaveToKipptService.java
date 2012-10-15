@@ -119,7 +119,7 @@ public class SaveToKipptService extends IntentService implements
 	}
 
 	@Override
-	public void onURLDeshortened(String resolution, int responseCode) {
+	public void onURLDeshortened(String resolution, int responseCode, String original) {
 		if (responseCode > 399 && fUrlDeshortener != null) {
 			fUrlDeshortener.cancel(true);
 			fUrlDeshortener = null;

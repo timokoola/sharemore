@@ -10,6 +10,8 @@
  ******************************************************************************/
 package com.moarub.sharemore;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import android.app.Activity;
@@ -29,6 +31,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -43,17 +46,20 @@ import com.moarub.util.UrlDeshortenerListener;
 
 public class ShareToKipptActivity extends Activity implements OnClickListener,
 		ClipCreatedListener, UrlDeshortenerListener, ListsListener {
+	private static final String SAVE_ALL_URLS = "Save all urls";
 	protected String fUrlShared;
+	protected ArrayList<String> fAllUrls = new ArrayList<String>();
 	protected String fTitle;
 	protected String fListUri;
 	private TextView fTitleView;
 	private TextView fNoteView;
 	private ConnectivityManager fConnectivityManager;
 	private String fGeneratedNoteText;
-	protected UrlDeshortener fUrlDeshortener;
+	protected HashMap<String, UrlDeshortener> fUrlDeshorteners = new HashMap<String, UrlDeshortener>();
 	private ListsGetter fListGetter;
 	private boolean fIgnoreShortening;
 	private Spinner fListSpinner;
+	private Spinner fUrlsSpinner;
 	private boolean fStar;
 	private boolean fReadLater;
 
@@ -61,6 +67,7 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_sahare_moar);
+		fAllUrls.add(SAVE_ALL_URLS);
 
 		handleIntentInit();
 		getLists();
@@ -87,9 +94,6 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
 	}
 
 	private void initViews() {
-		TextView urlV = (TextView) findViewById(R.id.urlTextEditor);
-		urlV.setText(fUrlShared);
-
 		fTitleView = (TextView) findViewById(R.id.titleTextEditor);
 		fTitleView.setText(fTitle);
 
@@ -104,47 +108,59 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
 	}
 
 	protected void handleIntentInit() {
-		Intent i = getIntent();
-
-		if (i != null && i.getType() != null
-				&& i.getType().equalsIgnoreCase("text/plain")) {
-			Bundle extras = i.getExtras();
-			fUrlShared = cleanAndLinkify(extras);
-			fTitle = extras.getString("android.intent.extra.SUBJECT");
-		}
-
-		if (fUrlShared == null) {
-			finishWithError(R.string.no_url_found_in_the_shared_text);
-		} else if (fUrlShared.length() < 27) {
-			fUrlDeshortener = new UrlDeshortener(this,0);
-			fUrlDeshortener.execute(fUrlShared);
-		}
-
 		if (isOnline()) {
 			fetchAPITokens();
 		} else {
 			finishWithError(R.string.inet_not_available);
 		}
+
+		Intent i = getIntent();
+		int urlCount = 0;
+
+		if (i != null && i.getType() != null
+				&& i.getType().equalsIgnoreCase("text/plain")) {
+			Bundle extras = i.getExtras();
+			urlCount = cleanAndLinkify(extras);
+			fTitle = extras.getString("android.intent.extra.SUBJECT");
+		}
+
+		if (urlCount < 1) {
+			finishWithError(R.string.no_url_found_in_the_shared_text);
+		}
+
+		for (String s : fAllUrls) {
+			if (s.length() < 27 && !s.equals(SAVE_ALL_URLS)) { // Yes, it is a completely random cut-off
+									// point
+				UrlDeshortener us = new UrlDeshortener(this, 0);
+				us.execute(s);
+				fUrlDeshorteners.put(s, us);
+			}
+		}
 	}
 
-	public String cleanAndLinkify(Bundle extras) {
+	public int cleanAndLinkify(Bundle extras) {
 		String urlCandidate = extras.getString("android.intent.extra.TEXT");
 		if (urlCandidate != null && urlCandidate.startsWith("http://")) {
-			return urlCandidate;
+			fAllUrls.add(urlCandidate);
 		} else {
 			Editable str = Editable.Factory.getInstance().newEditable(
-					urlCandidate);
+					" " + urlCandidate);
 			Linkify.addLinks(str, Linkify.WEB_URLS);
 			URLSpan[] urls = str.getSpans(0, str.length(), URLSpan.class);
 			if (urls == null || urls.length < 1) {
-				return null;
+				return 0;
 			}
 			URLSpan uspan = urls[0];
+
+			for (URLSpan us : urls) {
+				fAllUrls.add(us.getURL());
+			}
+
+			setupUrlSpinner();
+
 			fGeneratedNoteText = urlCandidate;
-
-			return uspan.getURL();
 		}
-
+		return fAllUrls.size();
 	}
 
 	private void finishWithError(int resId) {
@@ -185,19 +201,33 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
 		return true;
 	}
 
-	protected void createClip() {
-		if (fUrlDeshortener != null) {
-			fUrlDeshortener.cancel(true);
+	protected void createClips() {
+		if (fUrlDeshorteners != null) {
+			for (UrlDeshortener us : fUrlDeshorteners.values()) {
+				if (us != null) {
+					us.cancel(true);
+				}
+			}
 			fIgnoreShortening = true;
 		}
 		fTitle = fTitleView.getText().toString();
 		fListUri = fListSpinner.getSelectedItem() != null ? ((ListItem) fListSpinner
 				.getSelectedItem()).getUri() : null;
-		doCreateClip(fReadLater, fStar);
+		if (fUrlsSpinner.getSelectedItem() != null
+				&& fUrlsSpinner.getSelectedItem().equals(SAVE_ALL_URLS)) {
+			for (String u : fAllUrls) {
+				if (!fUrlsSpinner.getSelectedItem().equals(SAVE_ALL_URLS)) {
+					doCreateClip(u, fReadLater, fReadLater);
+				}
+			}
+		} else if (fUrlsSpinner.getSelectedItem() != null) {
+			doCreateClip((String) fUrlsSpinner.getSelectedItem(), fReadLater,
+					fStar);
+		}
 	}
 
-	public void doCreateClip(boolean readLater, boolean star) {
-		CreateClip cl = new CreateClip(fUrlShared, this);
+	public void doCreateClip(String url, boolean readLater, boolean star) {
+		CreateClip cl = new CreateClip(url, this);
 
 		cl.addTitle(fTitle);
 		cl.addListUri(fListUri);
@@ -218,7 +248,7 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
 
 	@Override
 	public void onClick(View v) {
-		createClip();
+		createClips();
 	}
 
 	@Override
@@ -261,7 +291,7 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
 			return true;
 		}
 		case R.id.menu_send: {
-			createClip();
+			createClips();
 		}
 		default:
 			return super.onOptionsItemSelected(item);
@@ -287,24 +317,23 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
 	}
 
 	@Override
-	public void onURLDeshortened(String resolution, int responseCode) {
+	public void onURLDeshortened(String resolution, int responseCode,
+			String original) {
 		if (resolution != null && !fIgnoreShortening) {
-			fUrlShared = resolution;
-			TextView urlView = (TextView) findViewById(R.id.urlTextEditor);
-			if (urlView != null) {
-				urlView.setText(fUrlShared);
-				urlView.invalidate();
-			}
+			fAllUrls.set(fAllUrls.indexOf(original), resolution);
+			setupUrlSpinner();
 			if (responseCode > 399) {
-				fUrlDeshortener.cancel(true);
-				fUrlDeshortener = null;
+				if (original != null && fUrlDeshorteners.containsKey(original)) {
+					fUrlDeshorteners.get(original).cancel(true);
+					fUrlDeshorteners.remove(original);
+				}
 			}
 
 		}
 	}
 
 	@Override
-	public void onTitleUpdate(String newTitle,String url) {
+	public void onTitleUpdate(String newTitle, String url) {
 		if (newTitle != null && !fIgnoreShortening) {
 			fTitleView.setText(newTitle);
 			fTitleView.invalidate();
@@ -326,6 +355,19 @@ public class ShareToKipptActivity extends Activity implements OnClickListener,
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		fListSpinner.setAdapter(adapter);
 		fListSpinner.setSelection(0);
+	}
+
+	private void setupUrlSpinner() {
+		fUrlsSpinner = (Spinner) findViewById(R.id.urlspinner);
+		LinearLayout All = (LinearLayout) findViewById(R.id.sharemoresavetokippt);
+		All.requestLayout();
+
+		ArrayAdapter<String> urlsAdapter = new ArrayAdapter<String>(this,
+				R.layout.spinner_item_lists, fAllUrls);
+		urlsAdapter
+				.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		fUrlsSpinner.setAdapter(urlsAdapter);
+		fUrlsSpinner.setSelection(0);
 	}
 
 }
