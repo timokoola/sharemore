@@ -54,11 +54,11 @@ public class LoginActivity extends Activity implements ApiTokenListener, OnClick
 		if(ready) {
 			setPreferences();
 			Toast.makeText(getApplicationContext(), "Authenticated" , Toast.LENGTH_SHORT).show();
+			setResult(700);
+			finish();
 		} else {
 			Toast.makeText(getApplicationContext(), "Authentication failed" , Toast.LENGTH_SHORT).show();
 		}
-		setResult(700);
-		finish();
 	}
 
 	private void setPreferences() {
