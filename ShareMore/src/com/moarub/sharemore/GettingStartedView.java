@@ -21,7 +21,6 @@ import android.text.TextPaint;
 import android.view.View;
 
 public class GettingStartedView extends View {
-	private Bitmap fBm; 
 	private static float LEFT_TEXT = 114.f;
 	private static float RIGHT_TEXT = 468.f;
 
@@ -29,8 +28,6 @@ public class GettingStartedView extends View {
 		super(context);
 		Options options = new Options();
 		options.inMutable = true;
-	//fBm = BitmapFactory.decodeResource(getResources(), R.raw.newspaper_better_light,options );
-		fBm = BitmapFactory.decodeStream(getResources().openRawResource(R.raw.blue_linen_dots));
 	}
 	
 	@Override
