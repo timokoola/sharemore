@@ -8,11 +8,13 @@ What is it?
 -----------
 
 This project now has:
-- Send to Kippt plugin (quick and with editing)
+- Send to Kippt plugin (quick)
 - Preferences view
 - Support for Android 4.0 and 4.1
 
-I expect there to be UX peculiarities and bugs still to iron out. Let's consider it an Beta for now. This app will be made available in Google Play early September as paid app, but app also will be always available as GPL software. 
+I expect there to be UX peculiarities and bugs still to iron out. Let's consider it a slightly relaxed Beta for now.
+
+There is a good Kippt client available in Play store, so I'll concentrate on other plugins whenever project is continued.
 
 Kippt Features
 --------------
@@ -24,19 +26,13 @@ Kippt Features
 Quick Save:
 - Saves shared item to Inbox
 - Preferences to mark Quick saves "Read Later" and/or Starred
-
-Save to Kippt:
-- Edit title, select list, edit URL, add notes to Saved item
-- Mark Read Later or Starred
-- For shared Tweets title updated from the URL to be saved
-- Shortened URLs deshortened before saving
+- Save all the the URLs mentioned in the Tweet
 
 Not yet:
-- Save all the the URLs mentioned in the Tweet
 - Notifications
 
 Not at all (for this app):
-- This app doesn't aim to be an app for browsing Kippt content or feeds. I *might* do that as a separate project, but I expect Kippt community to create one soon enough for all of us to enjoy.
+- This app doesn't aim to be an app for browsing Kippt content or feeds.
 
 Next steps:
 -----------
